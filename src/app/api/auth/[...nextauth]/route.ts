@@ -3,7 +3,7 @@ import { NextAuthOptions } from "next-auth";
 import { prisma } from "@/lib/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { NextResponse } from "next/server";
+import NextAuth from "next-auth";
 
 if (!process.env.NEXTAUTH_SECRET) {
   throw new Error('Please provide NEXTAUTH_SECRET environment variable');
@@ -80,6 +80,5 @@ export const authOptions: NextAuthOptions = {
   }
 };
 
-import NextAuth from "next-auth";
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST }; 
