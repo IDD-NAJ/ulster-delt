@@ -9,6 +9,8 @@
   NETLIFY_NEXT_PLUGIN_SKIP = "true"
   NODE_VERSION = "18"
   NEXT_PUBLIC_BASE_URL = "https://ulster-delt.netlify.app"
+  NEXT_TELEMETRY_DISABLED = "1"
+  NEXT_CACHE_DIR = ".next/cache"
 
 [build.processing]
   skip_processing = false
