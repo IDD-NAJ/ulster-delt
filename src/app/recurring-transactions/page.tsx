@@ -1,15 +1,9 @@
 "use client";
 
-import { Metadata } from "next";
 import { RecurringTransactionsList } from "@/components/recurring-transactions/RecurringTransactionsList";
 import { AddRecurringTransactionDialog } from "@/components/recurring-transactions/AddRecurringTransactionDialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-
-export const metadata: Metadata = {
-  title: "Recurring Transactions | Ulster Delt",
-  description: "Manage your recurring transactions",
-};
 
 export default function RecurringTransactionsPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
