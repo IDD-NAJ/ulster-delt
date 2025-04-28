@@ -1,46 +1,39 @@
 "use client";
 
+import { Metadata } from "next";
+import { RecurringTransactionsList } from "@/components/recurring-transactions/RecurringTransactionsList";
+import { AddRecurringTransactionDialog } from "@/components/recurring-transactions/AddRecurringTransactionDialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { createRecurringTransaction } from "./actions";
-import { toast } from "sonner";
+
+export const metadata: Metadata = {
+  title: "Recurring Transactions | Ulster Delt",
+  description: "Manage your recurring transactions",
+};
 
 export default function RecurringTransactionsPage() {
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleCreateTransaction = async () => {
-    try {
-      setIsLoading(true);
-      const result = await createRecurringTransaction({
-        amount: 100,
-        description: "Test recurring transaction",
-        frequency: "MONTHLY",
-        startDate: new Date(),
-      });
-
-      if (result.success) {
-        toast.success("Recurring transaction created successfully");
-      } else {
-        toast.error(result.error || "Failed to create recurring transaction");
-      }
-    } catch (error) {
-      toast.error("An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Recurring Transactions</h1>
       <div className="space-y-4">
         <Button
-          onClick={handleCreateTransaction}
+          onClick={() => setIsLoading(true)}
           disabled={isLoading}
         >
           {isLoading ? "Loading..." : "Add Recurring Transaction"}
         </Button>
       </div>
+
+      <RecurringTransactionsList />
+
+      <AddRecurringTransactionDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onSubmit={() => setIsAddDialogOpen(false)}
+      />
     </div>
   );
 } 

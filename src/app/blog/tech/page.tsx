@@ -5,21 +5,35 @@ import { Metadata } from "next";
 const techArticles = [
   {
     title: "The Future of Mobile Banking",
-    description: "How mobile technology is transforming the banking experience",
-    icon: Smartphone,
-    link: "/blog/tech/mobile-banking"
+    category: "Mobile Banking",
+    date: "April 28, 2024",
+    readTime: "5 min read",
+    excerpt: "Explore the latest trends in mobile banking and how they're shaping the future of financial services.",
+    icon: Smartphone
   },
   {
-    title: "Enhanced Security Measures",
-    description: "Latest security features to protect your financial data",
-    icon: Shield,
-    link: "/blog/tech/security"
+    title: "Enhancing Digital Security",
+    category: "Security",
+    date: "April 27, 2024",
+    readTime: "4 min read",
+    excerpt: "Learn about the latest security measures and how we're protecting your digital assets.",
+    icon: Shield
   },
   {
-    title: "Digital Payment Solutions",
-    description: "Innovative ways to make secure digital payments",
-    icon: CreditCard,
-    link: "/blog/tech/digital-payments"
+    title: "5G and Banking",
+    category: "Technology",
+    date: "April 26, 2024",
+    readTime: "3 min read",
+    excerpt: "How 5G technology is revolutionizing the banking experience.",
+    icon: Wifi
+  },
+  {
+    title: "Contactless Payments",
+    category: "Payments",
+    date: "April 25, 2024",
+    readTime: "4 min read",
+    excerpt: "The rise of contactless payments and their impact on everyday banking.",
+    icon: CreditCard
   }
 ];
 
@@ -36,20 +50,31 @@ export default function TechBlogPage() {
         {techArticles.map((article) => (
           <article
             key={article.title}
-            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+            className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow"
           >
-            <div className="flex items-center mb-4">
-              <article.icon className="w-6 h-6 text-primary mr-2" />
-              <h2 className="text-xl font-semibold">{article.title}</h2>
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-lg bg-primary/10">
+                <article.icon className="h-6 w-6 text-primary" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-4 text-sm text-gray-500 mb-2">
+                  <span>{article.category}</span>
+                  <span>•</span>
+                  <span>{article.date}</span>
+                  <span>•</span>
+                  <span>{article.readTime}</span>
+                </div>
+                <h2 className="text-2xl font-semibold mb-2">{article.title}</h2>
+                <p className="text-gray-600 mb-4">{article.excerpt}</p>
+                <Link
+                  href={`/blog/tech/${article.title.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="inline-flex items-center text-primary hover:underline"
+                >
+                  Read more
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
             </div>
-            <p className="text-gray-600 mb-4">{article.description}</p>
-            <Link
-              href={article.link}
-              className="inline-flex items-center text-primary hover:text-primary/80"
-            >
-              Read more
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Link>
           </article>
         ))}
       </div>
