@@ -1,7 +1,20 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import prisma from "./prisma";
+import { prisma } from './db';
 import { compare } from "bcryptjs";
+import { JWT } from 'next-auth/jwt';
+import { Session } from 'next-auth';
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      email?: string | null;
+      name?: string | null;
+      image?: string | null;
+    }
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -12,8 +25,15 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Missing credentials");
+        const isValidCredentials = (cred: any): cred is { email: string; password: string } => {
+          return Boolean(cred) && 
+            typeof cred === 'object' &&
+            typeof cred.email === 'string' && 
+            typeof cred.password === 'string';
+        };
+
+        if (!isValidCredentials(credentials)) {
+          throw new Error("Invalid credentials");
         }
 
         const user = await prisma.user.findUnique({
@@ -22,13 +42,13 @@ export const authOptions: NextAuthOptions = {
           }
         });
 
-        if (!user) {
+        if (!user || !user.password) {
           throw new Error("User not found");
         }
 
-        const isValid = await compare(credentials.password, user.password);
+        const isPasswordValid = await compare(credentials.password, user.password);
 
-        if (!isValid) {
+        if (!isPasswordValid) {
           throw new Error("Invalid password");
         }
 
@@ -53,11 +73,14 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
-    async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id as string;
-      }
-      return session;
+    async session({ session, token }): Promise<Session> {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id as string
+        }
+      };
     }
   }
 }; 

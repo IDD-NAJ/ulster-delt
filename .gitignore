@@ -55,22 +55,4 @@ yarn-error.log*
 
 # Typescript
 *.tsbuildinfo
-next-env.d.ts
-
-# Next.js
-/.next/
-/out/
-
-# Production
-/build
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# Cache
-.cache/
-.npm/
-.eslintcache 
+next-env.d.ts 

@@ -11,7 +11,7 @@ const options = {
             description: 'API documentation for Ulster Delt Investment platform',
             contact: {
                 name: 'API Support',
-                email: 'support@ulsterdelt.com'
+                email: 'customerservices@@ulsterdelt.it.com'
             }
         },
         servers: [

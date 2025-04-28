@@ -9,32 +9,31 @@ import QuickActions from '@/components/dashboard/QuickActions';
 import { Suspense } from 'react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Notifications } from '@/components/dashboard/Notifications';
+import { type Account, type Transaction } from '@prisma/client';
 
 export default async function DashboardPage() {
+  console.log('Starting dashboard page load');
+  
+  const session = await getServerSession(authOptions);
+  console.log('Session:', session ? 'Found' : 'Not found');
+
+  if (!session?.user?.email) {
+    console.log('No session or email, redirecting to login');
+    redirect('/login?callbackUrl=/dashboard');
+  }
+
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      redirect('/login?callbackUrl=/dashboard');
-    }
-
+    console.log('Fetching user data for email:', session.user.email);
     // Fetch user's account information with more comprehensive data
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email! },
+      where: { email: session.user.email },
       include: {
         accounts: {
           include: {
             transactions: {
               orderBy: { createdAt: 'desc' },
               take: 10,
-              select: {
-                id: true,
-                type: true,
-                amount: true,
-                description: true,
-                createdAt: true,
-                status: true,
-                currency: true,
+              include: {
                 category: {
                   select: {
                     name: true,
@@ -46,39 +45,32 @@ export default async function DashboardPage() {
             }
           }
         },
-        cards: {
-          select: {
-            id: true,
-            type: true,
-            lastFourDigits: true,
-            isActive: true,
-            expiryMonth: true,
-            expiryYear: true,
-          }
-        },
+        cards: true,
         notificationPreferences: true,
       },
     });
 
+    console.log('User data:', user ? 'Found' : 'Not found');
+
     if (!user) {
+      console.log('User not found in database, redirecting to login');
       redirect('/login');
     }
 
-    // Calculate total balance across all accounts
-    const totalBalance = user.accounts.reduce((sum, account) => sum + account.balance, 0);
-
-    // Get recent transactions for each account with enhanced data
+    // Get accounts with transactions
     const accountsWithTransactions = user.accounts.map(account => ({
       ...account,
       transactions: account.transactions.map(tx => ({
         ...tx,
-        category: {
-          name: tx.category?.name || 'Uncategorized',
-          color: tx.category?.color || '#808080',
-          icon: tx.category?.icon || '📊'
+        category: tx.category || {
+          name: 'Uncategorized',
+          color: '#808080',
+          icon: '📊'
         }
       }))
     }));
+
+    console.log('Rendering dashboard with accounts:', accountsWithTransactions.length);
 
     return (
       <DashboardLayout>
@@ -88,10 +80,7 @@ export default async function DashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
               <Suspense fallback={<LoadingSpinner />}>
-                <AccountSummary 
-                  accounts={accountsWithTransactions} 
-                  totalBalance={totalBalance}
-                />
+                <AccountSummary accounts={accountsWithTransactions} />
               </Suspense>
               
               <Suspense fallback={<LoadingSpinner />}>
@@ -103,10 +92,7 @@ export default async function DashboardPage() {
             
             <div className="space-y-6">
               <Suspense fallback={<LoadingSpinner />}>
-                <QuickActions 
-                  cards={user.cards}
-                  notificationPreferences={user.notificationPreferences}
-                />
+                <QuickActions />
               </Suspense>
             </div>
           </div>
@@ -117,14 +103,20 @@ export default async function DashboardPage() {
     );
   } catch (error) {
     console.error('Dashboard error:', error);
-    return (
-      <DashboardLayout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            <p>There was an error loading your dashboard. Please try again later.</p>
+    // Only handle actual errors, not redirects
+    if (error instanceof Error && !error.message.includes('NEXT_REDIRECT')) {
+      return (
+        <DashboardLayout>
+          <div className="container mx-auto px-4 py-8">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+              <p>There was an error loading your dashboard. Please try again later.</p>
+              <p className="mt-2 text-sm">Error details: {error.message}</p>
+            </div>
           </div>
-        </div>
-      </DashboardLayout>
-    );
+        </DashboardLayout>
+      );
+    }
+    // Re-throw redirect errors
+    throw error;
   }
 } 

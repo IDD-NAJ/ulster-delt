@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 
 // Prevent multiple instances of Prisma Client in development
 const globalForPrisma = globalThis as unknown as {
@@ -36,6 +36,8 @@ export async function createAccount(data: {
   type: string;
   userId: string;
   balance?: number;
+  provider: string;
+  providerAccountId: string;
 }) {
   return prisma.account.create({ data });
 }

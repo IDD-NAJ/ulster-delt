@@ -199,6 +199,6 @@ docker-compose up -d
 ### Support
 
 For support, contact:
-- Email: support@ulsterdelt.com
+- Email: customerservices@@ulsterdelt.it.com
 - Issue Tracker: GitHub Issues
 - Documentation: /docs directory 
