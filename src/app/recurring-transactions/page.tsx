@@ -13,13 +13,17 @@ export const metadata: Metadata = {
 
 export default function RecurringTransactionsPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Recurring Transactions</h1>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          Add Recurring Transaction
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Recurring Transactions</h1>
+      <div className="space-y-4">
+        <Button
+          onClick={() => setIsLoading(true)}
+          disabled={isLoading}
+        >
+          {isLoading ? "Loading..." : "Add Recurring Transaction"}
         </Button>
       </div>
 
