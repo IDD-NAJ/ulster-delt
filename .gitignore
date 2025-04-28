@@ -55,4 +55,18 @@ yarn-error.log*
 
 # Typescript
 *.tsbuildinfo
-next-env.d.ts 
+next-env.d.ts
+
+# Next.js
+/.next/
+
+# Prisma
+/prisma/migrations/
+/prisma/*.db
+/prisma/*.db-journal
+
+# Build output
+.next/
+out/
+build/
+dist/ 
