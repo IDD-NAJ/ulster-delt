@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: Request,
@@ -10,23 +10,21 @@ export async function GET(
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const recurringTransaction = await prisma.recurringTransaction.findFirst({
+    const recurringTransaction = await prisma.recurringTransaction.findUnique({
       where: {
         id: params.id,
-        userId: session.user.id,
       },
       include: {
-        account: true,
         category: true,
       },
     });
 
     if (!recurringTransaction) {
-      return new NextResponse("Recurring transaction not found", { status: 404 });
+      return new NextResponse("Not found", { status: 404 });
     }
 
     return NextResponse.json(recurringTransaction);
@@ -36,40 +34,29 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  req: Request,
+export async function PUT(
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const body = await req.json();
-    const {
-      description,
-      type,
-      amount,
-      currency,
-      frequency,
-      startDate,
-      endDate,
-    } = body;
+    const body = await request.json();
+    const { amount, description, frequency, startDate, endDate } = body;
 
     const recurringTransaction = await prisma.recurringTransaction.update({
       where: {
         id: params.id,
-        userId: session.user.id,
       },
       data: {
-        description,
-        type,
         amount,
-        currency,
+        description,
         frequency,
-        startDate: startDate ? new Date(startDate) : undefined,
+        startDate: new Date(startDate),
         endDate: endDate ? new Date(endDate) : null,
       },
     });
@@ -82,20 +69,19 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  req: Request,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     await prisma.recurringTransaction.delete({
       where: {
         id: params.id,
-        userId: session.user.id,
       },
     });
 
