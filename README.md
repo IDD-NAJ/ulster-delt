@@ -1,15 +1,89 @@
-# Ulster Delt
+# Ulster Delt - Personal Finance Management
 
 A personal finance management application built with Next.js, Prisma, and PostgreSQL.
 
+## Deployment Instructions
+
+### Prerequisites
+- Node.js 18 or later
+- PostgreSQL database
+- Netlify account
+
+### Environment Variables
+Create a `.env` file with the following variables:
+```env
+# Database connection string (PostgreSQL)
+DATABASE_URL="postgresql://username:password@host:port/database"
+
+# NextAuth.js configuration
+NEXTAUTH_SECRET="your-secret-key-at-least-32-chars"
+NEXTAUTH_URL="http://localhost:3000"
+
+# Application URLs
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+```
+
+### Netlify Deployment Steps
+
+1. **Connect Repository**
+   - Fork/Clone this repository
+   - Log in to Netlify
+   - Click "New site from Git"
+   - Choose your repository
+
+2. **Configure Build Settings**
+   - Build command: `npm run build`
+   - Publish directory: `.next`
+   - Node version: 18.x
+
+3. **Environment Variables**
+   Add the following environment variables in Netlify:
+   - `DATABASE_URL`
+   - `NEXTAUTH_SECRET`
+   - `NEXTAUTH_URL` (your Netlify URL)
+   - `NEXT_PUBLIC_APP_URL` (your Netlify URL)
+
+4. **Database Setup**
+   - Ensure your PostgreSQL database is accessible from Netlify
+   - The deployment script will automatically:
+     - Run database migrations
+     - Generate Prisma client
+     - Test database connection
+
+### Local Development
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Run database migrations:
+   ```bash
+   npm run prisma:migrate
+   ```
+
+3. Start development server:
+   ```bash
+   npm run dev
+   ```
+
+### Troubleshooting
+
+If you encounter deployment issues:
+
+1. Check environment variables in Netlify
+2. Verify database connection string
+3. Check build logs for specific errors
+4. Ensure PostgreSQL database is accessible
+
 ## Features
 
+- Recurring transactions management
 - User authentication
-- Account management
-- Transaction tracking
-- Recurring transactions
-- Category management
-- Dashboard with financial insights
+- Real-time updates
+- Responsive design
+- Dark/Light mode
+- And more...
 
 ## Tech Stack
 
