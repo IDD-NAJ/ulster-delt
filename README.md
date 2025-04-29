@@ -13,14 +13,14 @@ A personal finance management application built with Next.js, Prisma, and Postgr
 Create a `.env` file with the following variables:
 ```env
 # Database connection string (PostgreSQL)
-DATABASE_URL="postgresql://your-username:your-password@your-host:5432/your-database?schema=public"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ulster_delt?schema=public"
 
 # NextAuth.js configuration
 NEXTAUTH_SECRET="j15s0r596z02bdVVpkrSbHf0hDkbrEL8MzCxtsOMdM8="
-NEXTAUTH_URL="https://your-site-name.netlify.app"
+NEXTAUTH_URL="http://localhost:3000"
 
 # Application URLs
-NEXT_PUBLIC_APP_URL="https://your-site-name.netlify.app"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 
 ### Netlify Deployment Steps
@@ -43,15 +43,15 @@ NEXT_PUBLIC_APP_URL="https://your-site-name.netlify.app"
      ```
      DATABASE_URL=your-postgresql-connection-string
      NEXTAUTH_SECRET=your-secret-key
-     NEXTAUTH_URL=your-netlify-url
-     NEXT_PUBLIC_APP_URL=your-netlify-url
+     NEXTAUTH_URL=https://ulster-delt.netlify.app
+     NEXT_PUBLIC_APP_URL=https://ulster-delt.netlify.app
      ```
    - For `NEXTAUTH_SECRET`, generate a secure random string:
      ```bash
      openssl rand -base64 32
      ```
    - For `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL`, use your Netlify site URL
-     (e.g., https://your-site-name.netlify.app)
+     (e.g., https://ulster-delt.netlify.app)
 
 4. **Database Setup**
    - Ensure your PostgreSQL database is accessible from Netlify
