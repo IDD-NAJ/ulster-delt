@@ -10,7 +10,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "setup-admin": "ts-node src/scripts/setupAdmin.ts"
+    "setup-admin": "ts-node --transpile-only src/scripts/createAdmin.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.0",

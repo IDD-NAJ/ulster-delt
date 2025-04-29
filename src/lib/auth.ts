@@ -5,12 +5,19 @@ import { compare } from "bcryptjs";
 import { JWT } from 'next-auth/jwt';
 import { Session } from 'next-auth';
 
+// Define custom types
+interface CustomUser {
+  id: string;
+  email: string;
+  name?: string | null;
+  role?: string;
+}
+
 declare module "next-auth" {
+  interface User extends CustomUser {}
+  
   interface Session {
-    user: {
-      id: string;
-      email?: string | null;
-      name?: string | null;
+    user: CustomUser & {
       image?: string | null;
     }
   }
@@ -36,27 +43,64 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials");
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
-          }
-        });
+        // Try to find user in both User and AdminUser tables
+        const [user, adminUser] = await Promise.all([
+          prisma.user.findUnique({
+            where: { email: credentials.email },
+            select: {
+              id: true,
+              email: true,
+              password: true,
+              name: true,
+              role: true,
+            },
+          }),
+          prisma.adminUser.findUnique({
+            where: { email: credentials.email },
+            select: {
+              id: true,
+              email: true,
+              hashedPassword: true,
+              name: true,
+              role: true,
+            },
+          }),
+        ]);
 
-        if (!user || !user.password) {
+        // Check if user exists in either table
+        if (!user && !adminUser) {
           throw new Error("User not found");
         }
 
-        const isPasswordValid = await compare(credentials.password, user.password);
-
-        if (!isPasswordValid) {
-          throw new Error("Invalid password");
+        // Handle regular user authentication
+        if (user && user.password) {
+          const isPasswordValid = await compare(credentials.password, user.password);
+          if (!isPasswordValid) {
+            throw new Error("Invalid password");
+          }
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
         }
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        };
+        // Handle admin user authentication
+        if (adminUser) {
+          const isPasswordValid = await compare(credentials.password, adminUser.hashedPassword);
+          if (!isPasswordValid) {
+            throw new Error("Invalid password");
+          }
+          return {
+            id: adminUser.id,
+            email: adminUser.email,
+            name: adminUser.name,
+            role: adminUser.role,
+          };
+        }
+
+        throw new Error("Invalid credentials");
       }
     })
   ],
@@ -70,6 +114,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.role = user.role;
       }
       return token;
     },
@@ -78,7 +123,8 @@ export const authOptions: NextAuthOptions = {
         ...session,
         user: {
           ...session.user,
-          id: token.id as string
+          id: token.id as string,
+          role: token.role as string,
         }
       };
     }

@@ -32,6 +32,7 @@ import {
   EllipsisVerticalIcon,
   PlusIcon,
   TrashIcon,
+  CreditCardIcon,
 } from '@heroicons/react/24/outline';
 import { Select } from '@/components/ui/select';
 import { useRouter } from 'next/navigation';
@@ -56,6 +57,14 @@ interface User {
   balance: number;
   accounts: Account[];
   accountId?: string;
+}
+
+interface CardData {
+  id: string;
+  cardNumber: string;
+  expiryDate: Date;
+  status: string;
+  type: string;
 }
 
 interface UserTableClientProps {
@@ -92,6 +101,10 @@ export default function UserTableClient({ users: initialUsers }: UserTableClient
   const [editTxId, setEditTxId] = useState<string | null>(null);
   const [deleteUserDialogOpen, setDeleteUserDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [cardDialogOpen, setCardDialogOpen] = useState(false);
+  const [userCards, setUserCards] = useState<CardData[]>([]);
+  const [selectedUserForCard, setSelectedUserForCard] = useState<User | null>(null);
+  const [freezeAccountsDialogOpen, setFreezeAccountsDialogOpen] = useState(false);
   const router = useRouter();
 
   const filteredUsers = users.filter(
@@ -388,6 +401,54 @@ export default function UserTableClient({ users: initialUsers }: UserTableClient
     users[0].accounts[0].transactions.unshift(newTransaction);
   }
 
+  const openCardDialog = async (user: User) => {
+    setSelectedUserForCard(user);
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}/cards`, {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to fetch cards');
+      }
+      const cards = await res.json();
+      setUserCards(cards);
+      setCardDialogOpen(true);
+    } catch (error) {
+      console.error('Error fetching cards:', error);
+      alert(error instanceof Error ? error.message : 'Failed to fetch cards');
+    }
+  };
+
+  const handleAddCard = async (userId: string, accountId: string) => {
+    try {
+      const res = await fetch('/api/cards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accountId }),
+      });
+      if (!res.ok) throw new Error('Failed to add card');
+      const newCard = await res.json();
+      setUserCards([...userCards, newCard.card]);
+    } catch (error) {
+      console.error('Error adding card:', error);
+      alert('Failed to add card');
+    }
+  };
+
+  const handleDeleteCard = async (cardId: string) => {
+    try {
+      const res = await fetch(`/api/cards/${cardId}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Failed to delete card');
+      setUserCards(userCards.filter(card => card.id !== cardId));
+    } catch (error) {
+      console.error('Error deleting card:', error);
+      alert('Failed to delete card');
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -398,56 +459,61 @@ export default function UserTableClient({ users: initialUsers }: UserTableClient
             Manage user accounts and permissions
           </p>
         </div>
-        <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center space-x-2">
-              <PlusIcon className="h-5 w-5" />
-              <span>Add User</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New User</DialogTitle>
-              <DialogDescription>
-                Create a new user account with specified permissions.
-              </DialogDescription>
-            </DialogHeader>
-            <form
-              onSubmit={e => {
-                e.preventDefault();
-                handleAddUser();
-              }}
-              className="space-y-4"
-            >
-              <Input
-                required
-                placeholder="Name"
-                value={form.name}
-                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-              />
-              <Input
-                required
-                type="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-              />
-              <Select
-                value={form.role}
-                onValueChange={role => setForm(f => ({ ...f, role }))}
+        <div className="flex gap-2">
+          <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="flex items-center space-x-2">
+                <PlusIcon className="h-5 w-5" />
+                <span>Add User</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New User</DialogTitle>
+                <DialogDescription>
+                  Create a new user account with specified permissions.
+                </DialogDescription>
+              </DialogHeader>
+              <form
+                onSubmit={e => {
+                  e.preventDefault();
+                  handleAddUser();
+                }}
+                className="space-y-4"
               >
-                <option value="USER">User</option>
-                <option value="ADMIN">Admin</option>
-              </Select>
-              <div className="flex justify-end gap-2">
-                <DialogClose asChild>
-                  <Button type="button" variant="outline">Cancel</Button>
-                </DialogClose>
-                <Button type="submit">Add User</Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+                <Input
+                  required
+                  placeholder="Name"
+                  value={form.name}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                />
+                <Input
+                  required
+                  type="email"
+                  placeholder="Email"
+                  value={form.email}
+                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                />
+                <Select
+                  value={form.role}
+                  onValueChange={role => setForm(f => ({ ...f, role }))}
+                >
+                  <option value="USER">User</option>
+                  <option value="ADMIN">Admin</option>
+                </Select>
+                <div className="flex justify-end gap-2">
+                  <DialogClose asChild>
+                    <Button type="button" variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button type="submit">Add User</Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+          <Button variant="outline" onClick={() => setFreezeAccountsDialogOpen(true)}>
+            Freeze/Unfreeze Accounts
+          </Button>
+        </div>
       </div>
       {/* Search and filters */}
       <div className="flex items-center space-x-4 mb-6">
@@ -489,7 +555,15 @@ export default function UserTableClient({ users: initialUsers }: UserTableClient
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <span
+                    className={
+                      user.status === 'Active'
+                        ? 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'
+                        : user.status === 'Frozen'
+                        ? 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800'
+                        : 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800'
+                    }
+                  >
                     {user.status}
                   </span>
                 </TableCell>
@@ -522,13 +596,14 @@ export default function UserTableClient({ users: initialUsers }: UserTableClient
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => openBalanceDialog(user)}>Edit Balance</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => openFreezeDialog(user)}>
-                        {user.status === 'Active' ? 'Freeze Account' : 'Unfreeze Account'}
-                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => openEditDialog(user)}>Edit User</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => router.push(`/admin/users/${user.id}`)}>View Details</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => { setUserToDelete(user); setDeleteUserDialogOpen(true); }} className="text-red-600">
                         Delete User
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => openCardDialog(user)}>
+                        <CreditCardIcon className="mr-2 h-4 w-4" />
+                        Manage Cards
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -824,6 +899,119 @@ export default function UserTableClient({ users: initialUsers }: UserTableClient
             <Button type="button" variant="destructive" onClick={() => userToDelete && handleDeleteUser()} disabled={loading}>
               Delete
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Card Dialog */}
+      <Dialog open={cardDialogOpen} onOpenChange={setCardDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Manage Cards</DialogTitle>
+            <DialogDescription>
+              Add or delete cards for {selectedUserForCard?.name}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {selectedUserForCard?.accounts.map((account) => (
+              <div key={account.id} className="flex items-center justify-between p-2 border rounded">
+                <div>
+                  <p className="font-medium">{ACCOUNT_TYPE_LABELS[account.type]}</p>
+                  <p className="text-sm text-gray-500">Account: {account.accountNumber}</p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => handleAddCard(selectedUserForCard.id, account.id)}
+                >
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  Add Card
+                </Button>
+              </div>
+            ))}
+
+            <div className="mt-6">
+              <h4 className="font-medium mb-2">Existing Cards</h4>
+              {userCards.map((card) => (
+                <div key={card.id} className="flex items-center justify-between p-2 border rounded mb-2">
+                  <div>
+                    <p className="font-medium">{card.type} Card</p>
+                    <p className="text-sm text-gray-500">
+                      **** **** **** {card.cardNumber.slice(-4)}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Expires: {new Date(card.expiryDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDeleteCard(card.id)}
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              {userCards.length === 0 && (
+                <p className="text-sm text-gray-500 text-center">No cards found</p>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Freeze/Unfreeze Accounts Dialog */}
+      <Dialog open={freezeAccountsDialogOpen} onOpenChange={setFreezeAccountsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Freeze/Unfreeze Accounts</DialogTitle>
+            <DialogDescription>
+              Toggle the status of user accounts below.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 max-h-96 overflow-y-auto">
+            {users.map(user => (
+              <div key={user.id} className="flex items-center justify-between border rounded p-2">
+                <div>
+                  <p className="font-medium">{user.name} <span className="text-xs text-gray-500">({user.email})</span></p>
+                  <p className="text-xs text-gray-500">Current status: <span className={
+                    user.status === 'Active'
+                      ? 'text-green-600'
+                      : user.status === 'Frozen'
+                      ? 'text-blue-600'
+                      : 'text-red-600'
+                  }>{user.status}</span></p>
+                </div>
+                <Button
+                  size="sm"
+                  variant={user.status === 'Active' ? 'destructive' : 'default'}
+                  onClick={async () => {
+                    setLoading(true);
+                    try {
+                      const newStatus = user.status === 'Active' ? 'Frozen' : 'Active';
+                      const res = await fetch('/api/admin/users', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: user.id, name: user.name, email: user.email, role: user.role, status: newStatus }),
+                      });
+                      if (!res.ok) throw new Error(await res.text() || 'Failed to update status');
+                      const updatedUser = await res.json();
+                      setUsers(users => users.map(u => u.id === updatedUser.id ? { ...u, ...updatedUser } : u));
+                    } catch (err) {
+                      alert(err instanceof Error ? err.message : 'Failed to update status');
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  disabled={loading}
+                >
+                  {user.status === 'Active' ? 'Freeze' : 'Unfreeze'}
+                </Button>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-end mt-4">
+            <DialogClose asChild>
+              <Button type="button" variant="outline">Close</Button>
+            </DialogClose>
           </div>
         </DialogContent>
       </Dialog>

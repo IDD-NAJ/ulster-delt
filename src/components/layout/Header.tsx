@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, ChevronDown, Globe, UserCircle } from "lucide-react";
+import { Menu, X, ChevronDown, Globe, UserCircle, Building2, Wallet, Settings, CreditCard, MoreHorizontal, Newspaper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,12 +28,12 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import type { Language } from "@/contexts/LanguageContext";
 
 const mainNavItems = [
-  { name: "Bank", href: "/bank" },
-  { name: "Financial Products", href: "/financial-products" },
-  { name: "Manage", href: "/manage" },
-  { name: "Pay", href: "/pay" },
-  { name: "More", href: "#", hasDropdown: true },
-  { name: "Blog", href: "/blog" },
+  { name: "Bank", href: "/bank", icon: Building2, color: "text-blue-600" },
+  { name: "Financial Products", href: "/financial-products", icon: Wallet, color: "text-green-600" },
+  { name: "Manage", href: "/manage", icon: Settings, color: "text-purple-600" },
+  { name: "Pay", href: "/pay", icon: CreditCard, color: "text-orange-600" },
+  { name: "More", href: "#", hasDropdown: true, icon: MoreHorizontal, color: "text-gray-600" },
+  { name: "Blog", href: "/blog", icon: Newspaper, color: "text-red-600" },
 ];
 
 const languages = [
@@ -106,7 +106,8 @@ export function Header() {
                     else if (activeDropdown === item.name) setActiveDropdown(null);
                   }}>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="link" className="text-foreground">
+                      <Button variant="link" className={cn("flex items-center", item.color)}>
+                        <item.icon className="mr-2 h-4 w-4" />
                         {item.name} <ChevronDown className="ml-1 h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -128,8 +129,13 @@ export function Header() {
                 ) : (
                   <Link
                     href={item.href}
-                    className="text-sm font-medium text-foreground hover:text-primary"
+                    className={cn(
+                      "text-sm font-medium flex items-center transition-colors duration-200",
+                      item.color,
+                      "hover:opacity-80"
+                    )}
                   >
+                    <item.icon className="mr-2 h-4 w-4" />
                     {item.name}
                   </Link>
                 )}
@@ -218,8 +224,13 @@ export function Header() {
                     <SheetClose key={item.name} asChild>
                       <Link
                         href={item.href}
-                        className="text-lg font-medium text-foreground hover:text-primary"
+                        className={cn(
+                          "text-lg font-medium flex items-center transition-colors duration-200",
+                          item.color,
+                          "hover:opacity-80"
+                        )}
                       >
+                        <item.icon className="mr-2 h-4 w-4" />
                         {item.name}
                       </Link>
                     </SheetClose>

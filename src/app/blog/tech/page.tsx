@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Smartphone, Shield, Wifi, CreditCard, Smartphone } from "lucide-react";
+import { ArrowRight, Smartphone, Shield, Wifi, CreditCard } from "lucide-react";
 
 const techArticles = [
   {

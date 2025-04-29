@@ -58,11 +58,11 @@ export async function POST(req: NextRequest) {
 
 // PUT: Update user
 export async function PUT(req: NextRequest) {
-  const { id, name, email, role } = await req.json();
+  const { id, name, email, role, status } = await req.json();
   if (!id) return NextResponse.json({ error: 'Missing user id' }, { status: 400 });
   const user = await prisma.user.update({
     where: { id },
-    data: { name, email, role },
+    data: { name, email, role, status },
   });
   return NextResponse.json(user);
 }

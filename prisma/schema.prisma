@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/client"
 }
 
 datasource db {
@@ -18,22 +17,23 @@ model User {
   phoneNumber             String?
   createdAt               DateTime                 @default(now())
   updatedAt               DateTime                 @updatedAt
+  emailVerified           DateTime?
+  image                   String?
+  name                    String?
+  password                String?
+  role                    UserRole                 @default(USER)
   accounts                Account[]
   address                 Address?
+  cards                   Card[]
+  Notification            Notification[]
+  notificationPreferences NotificationPreferences?
   recurringTransactions   RecurringTransaction[]
   securityInfo            SecurityInfo?
+  sessions                Session[]
   transactions            Transaction[]
   transactionCategories   TransactionCategory[]
   transactionTemplates    TransactionTemplate[]
-  cards                   Card[]
-  notificationPreferences NotificationPreferences?
-  role                    UserRole                 @default(USER)
-  sessions                Session[]
-  name                    String?
-  emailVerified           DateTime?
-  password                String?
-  image                   String?
-  Notification            Notification[]
+  status                  UserStatus               @default(Active)
 }
 
 model Address {
@@ -65,25 +65,25 @@ model SecurityInfo {
 model Account {
   id                    String                 @id @default(cuid())
   type                  String
-  accountNumber         String                 @unique @default(uuid())
   balance               Float                  @default(0)
   userId                String
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
+  accountNumber         String                 @unique @default(uuid())
+  access_token          String?
+  expires_at            Int?
+  id_token              String?
+  provider              String
+  providerAccountId     String
+  refresh_token         String?
+  scope                 String?
+  session_state         String?
+  token_type            String?
   user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cards                 Card[]
   recurringTransactions RecurringTransaction[]
   transactions          Transaction[]
   transactionTemplates  TransactionTemplate[]
-  cards                 Card[]
-  provider              String
-  providerAccountId     String
-  refresh_token         String?                @db.Text
-  access_token          String?                @db.Text
-  expires_at            Int?
-  token_type            String?
-  scope                 String?
-  id_token              String?                @db.Text
-  session_state         String?
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -180,22 +180,22 @@ model TransactionTemplate {
 }
 
 model Card {
-  id          String       @id @default(cuid())
-  accountId   String
-  account     Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type        CardType     @default(DEBIT)
-  cardNumber  String       @unique
-  expiryDate  DateTime
-  cvv         String
-  status      CardStatus   @default(ACTIVE)
-  isVirtual   Boolean      @default(false)
-  dailyLimit  Float        @default(1000)
-  monthlyLimit Float       @default(10000)
-  lastUsed    DateTime?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id           String     @id @default(cuid())
+  userId       String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  cvv          String
+  accountId    String
+  cardNumber   String     @unique
+  expiryDate   DateTime
+  status       CardStatus @default(ACTIVE)
+  type         CardType   @default(DEBIT)
+  dailyLimit   Float      @default(1000)
+  isVirtual    Boolean    @default(false)
+  lastUsed     DateTime?
+  monthlyLimit Float      @default(10000)
+  account      Account    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([accountId])
   @@index([userId])
@@ -222,6 +222,35 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model AdminUser {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String
+  hashedPassword String
+  role           String   @default("ADMIN")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String?
+  isActive  Boolean  @default(true)
+  type      String
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
 enum AccountType {
@@ -267,35 +296,6 @@ enum UserRole {
   ADMIN
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-model AdminUser {
-  id             String   @id @default(cuid())
-  email          String   @unique
-  name           String
-  hashedPassword String
-  role           String   @default("ADMIN")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-}
-
-model Notification {
-  id        String   @id @default(cuid())
-  message   String
-  type      String
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
-}
-
 enum CardType {
   DEBIT
   CREDIT
@@ -305,4 +305,10 @@ enum CardStatus {
   ACTIVE
   BLOCKED
   EXPIRED
+}
+
+enum UserStatus {
+  Active
+  Frozen
+  Inactive
 }
