@@ -13,15 +13,13 @@ A personal finance management application built with Next.js, Prisma, and Postgr
 Create a `.env` file with the following variables:
 ```env
 # Database connection string (PostgreSQL)
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ulster_delt?schema=public"
-
+postgresql://postgres:[YOUR-PASSWORD]@db.aapfntknrkwbtddzdgjb.supabase.co:5432/postgres
 # NextAuth.js configuration
 NEXTAUTH_SECRET="j15s0r596z02bdVVpkrSbHf0hDkbrEL8MzCxtsOMdM8="
-NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_URL=https://ulster-delt.netlify.app
 
 # Application URLs
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-```
+   NEXT_PUBLIC_APP_URL=https://ulster-delt.netlify.app
 
 ### Netlify Deployment Steps
 
@@ -41,8 +39,8 @@ NEXT_PUBLIC_APP_URL="http://localhost:3000"
    - Go to Site settings > Build & deploy > Environment variables
    - Add each variable with its value:
      ```
-     DATABASE_URL=your-postgresql-connection-string
-     NEXTAUTH_SECRET=your-secret-key
+     DATABASE_URL=[Your Supabase connection string]
+     NEXTAUTH_SECRET=j15s0r596z02bdVVpkrSbHf0hDkbrEL8MzCxtsOMdM8=
      NEXTAUTH_URL=https://ulster-delt.netlify.app
      NEXT_PUBLIC_APP_URL=https://ulster-delt.netlify.app
      ```
@@ -134,7 +132,7 @@ npm install
 3. Create a `.env` file with the following variables:
 
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ulster_delt?schema=public"
+DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="your-secret-key"
 ```
