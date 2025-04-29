@@ -5,10 +5,20 @@ import { RecurringTransactionsList } from "@/components/recurring-transactions/R
 import { AddRecurringTransactionDialog } from "@/components/recurring-transactions/AddRecurringTransactionDialog";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
+import { useRecurringTransactions } from "@/hooks/useRecurringTransactions";
 import { useState } from "react";
 
 const RecurringTransactionsPage = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { recurringTransactions, isLoading, error } = useRecurringTransactions();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <div className="container mx-auto py-8">
@@ -21,7 +31,10 @@ const RecurringTransactionsPage = () => {
         </Button>
       </PageHeader>
 
-      <RecurringTransactionsList />
+      <RecurringTransactionsList 
+        recurringTransactions={recurringTransactions || []}
+        onUpdate={() => {}}
+      />
 
       <AddRecurringTransactionDialog
         open={isAddDialogOpen}
