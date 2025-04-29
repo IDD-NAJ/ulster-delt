@@ -13,7 +13,7 @@ A personal finance management application built with Next.js, Prisma, and Postgr
 Create a `.env` file with the following variables:
 ```env
 # Database connection string (PostgreSQL)
-postgresql://postgres:[YOUR-PASSWORD]@db.aapfntknrkwbtddzdgjb.supabase.co:5432/postgres
+DATABASE_URL="postgresql://postgres:Gold4me.471@1761@db.aapfntknrkwbtddzdgjb.supabase.co:5432/postgres"
 # NextAuth.js configuration
 NEXTAUTH_SECRET="j15s0r596z02bdVVpkrSbHf0hDkbrEL8MzCxtsOMdM8="
 NEXTAUTH_URL=https://ulster-delt.netlify.app
@@ -132,10 +132,9 @@ npm install
 3. Create a `.env` file with the following variables:
 
 ```env
-DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-secret-key"
-```
+DATABASE_URL="postgresql://postgres:2303@db.aapfntknrkwbtddzdgjb.supabase.co:5432/postgres"
+NEXTAUTH_URL=https://ulster-delt.netlify.app
+NEXTAUTH_SECRET="j15s0r596z02bdVVpkrSbHf0hDkbrEL8MzCxtsOMdM8="
 
 4. Set up the database:
 
