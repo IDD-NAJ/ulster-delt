@@ -13,14 +13,14 @@ A personal finance management application built with Next.js, Prisma, and Postgr
 Create a `.env` file with the following variables:
 ```env
 # Database connection string (PostgreSQL)
-DATABASE_URL="postgresql://username:password@host:port/database"
+DATABASE_URL="postgresql://your-username:your-password@your-host:5432/your-database?schema=public"
 
 # NextAuth.js configuration
-NEXTAUTH_SECRET="your-secret-key-at-least-32-chars"
-NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="j15s0r596z02bdVVpkrSbHf0hDkbrEL8MzCxtsOMdM8="
+NEXTAUTH_URL="https://your-site-name.netlify.app"
 
 # Application URLs
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
+NEXT_PUBLIC_APP_URL="https://your-site-name.netlify.app"
 ```
 
 ### Netlify Deployment Steps
