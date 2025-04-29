@@ -15,6 +15,13 @@ async function deploymentChecks() {
   const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
   if (missingEnvVars.length > 0) {
     console.error('❌ Missing required environment variables:', missingEnvVars.join(', '));
+    console.error('\nPlease set these environment variables in your Netlify dashboard:');
+    console.error('1. Go to Site settings > Build & deploy > Environment variables');
+    console.error('2. Add the following variables:');
+    missingEnvVars.forEach(envVar => {
+      console.error(`   - ${envVar}`);
+    });
+    console.error('\nFor local development, create a .env file with these variables.');
     process.exit(1);
   }
 

@@ -38,10 +38,20 @@ NEXT_PUBLIC_APP_URL="http://localhost:3000"
 
 3. **Environment Variables**
    Add the following environment variables in Netlify:
-   - `DATABASE_URL`
-   - `NEXTAUTH_SECRET`
-   - `NEXTAUTH_URL` (your Netlify URL)
-   - `NEXT_PUBLIC_APP_URL` (your Netlify URL)
+   - Go to Site settings > Build & deploy > Environment variables
+   - Add each variable with its value:
+     ```
+     DATABASE_URL=your-postgresql-connection-string
+     NEXTAUTH_SECRET=your-secret-key
+     NEXTAUTH_URL=your-netlify-url
+     NEXT_PUBLIC_APP_URL=your-netlify-url
+     ```
+   - For `NEXTAUTH_SECRET`, generate a secure random string:
+     ```bash
+     openssl rand -base64 32
+     ```
+   - For `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL`, use your Netlify site URL
+     (e.g., https://your-site-name.netlify.app)
 
 4. **Database Setup**
    - Ensure your PostgreSQL database is accessible from Netlify
@@ -72,9 +82,25 @@ NEXT_PUBLIC_APP_URL="http://localhost:3000"
 If you encounter deployment issues:
 
 1. Check environment variables in Netlify
-2. Verify database connection string
-3. Check build logs for specific errors
-4. Ensure PostgreSQL database is accessible
+   - Verify all required variables are set
+   - Check for typos in variable names
+   - Ensure values are correct
+
+2. Verify database connection
+   - Check if database is accessible from Netlify
+   - Verify connection string format
+   - Ensure database user has proper permissions
+
+3. Check build logs
+   - Look for specific error messages
+   - Verify build command execution
+   - Check for missing dependencies
+
+4. Common issues:
+   - Missing environment variables
+   - Database connection failures
+   - Build command errors
+   - Node version mismatches
 
 ## Features
 
