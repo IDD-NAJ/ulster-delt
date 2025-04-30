@@ -1,155 +1,91 @@
-# Ulster Delt - Personal Finance Management
+# Ulster Delt Investment
 
-A personal finance management application built with Next.js, Prisma, and PostgreSQL.
-
-## Deployment Instructions
-
-### Prerequisites
-- Node.js 18 or later
-- PostgreSQL database
-- Netlify account
-
-### Environment Variables
-Create a `.env` file with the following variables:
-```env
-# Database connection string (PostgreSQL)
-DATABASE_URL="postgresql://postgres:Gold4me.471@1761@db.aapfntknrkwbtddzdgjb.supabase.co:5432/postgres"
-# NextAuth.js configuration
-NEXTAUTH_SECRET="j15s0r596z02bdVVpkrSbHf0hDkbrEL8MzCxtsOMdM8="
-NEXTAUTH_URL=https://ulster-delt.netlify.app
-
-# Application URLs
-   NEXT_PUBLIC_APP_URL=https://ulster-delt.netlify.app
-
-### Netlify Deployment Steps
-
-1. **Connect Repository**
-   - Fork/Clone this repository
-   - Log in to Netlify
-   - Click "New site from Git"
-   - Choose your repository
-
-2. **Configure Build Settings**
-   - Build command: `npm run build`
-   - Publish directory: `.next`
-   - Node version: 18.x
-
-3. **Environment Variables**
-   Add the following environment variables in Netlify:
-   - Go to Site settings > Build & deploy > Environment variables
-   - Add each variable with its value:
-     ```
-     DATABASE_URL=[Your Supabase connection string]
-     NEXTAUTH_SECRET=j15s0r596z02bdVVpkrSbHf0hDkbrEL8MzCxtsOMdM8=
-     NEXTAUTH_URL=https://ulster-delt.netlify.app
-     NEXT_PUBLIC_APP_URL=https://ulster-delt.netlify.app
-     ```
-   - For `NEXTAUTH_SECRET`, generate a secure random string:
-     ```bash
-     openssl rand -base64 32
-     ```
-   - For `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL`, use your Netlify site URL
-     (e.g., https://ulster-delt.netlify.app)
-
-4. **Database Setup**
-   - Ensure your PostgreSQL database is accessible from Netlify
-   - The deployment script will automatically:
-     - Run database migrations
-     - Generate Prisma client
-     - Test database connection
-
-### Local Development
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Run database migrations:
-   ```bash
-   npm run prisma:migrate
-   ```
-
-3. Start development server:
-   ```bash
-   npm run dev
-   ```
-
-### Troubleshooting
-
-If you encounter deployment issues:
-
-1. Check environment variables in Netlify
-   - Verify all required variables are set
-   - Check for typos in variable names
-   - Ensure values are correct
-
-2. Verify database connection
-   - Check if database is accessible from Netlify
-   - Verify connection string format
-   - Ensure database user has proper permissions
-
-3. Check build logs
-   - Look for specific error messages
-   - Verify build command execution
-   - Check for missing dependencies
-
-4. Common issues:
-   - Missing environment variables
-   - Database connection failures
-   - Build command errors
-   - Node version mismatches
+A personal finance management application built with Next.js, Prisma, and Supabase.
 
 ## Features
 
-- Recurring transactions management
-- User authentication
-- Real-time updates
-- Responsive design
-- Dark/Light mode
-- And more...
+- User authentication and authorization
+- Account management
+- Transaction tracking
+- Card management
+- Notifications
+- Security features
 
 ## Tech Stack
 
 - [Next.js](https://nextjs.org/) - React framework
-- [Prisma](https://www.prisma.io/) - Database ORM
-- [PostgreSQL](https://www.postgresql.org/) - Database
+- [Prisma](https://www.prisma.io/) - ORM
+- [Supabase](https://supabase.com/) - Backend as a Service
 - [Tailwind CSS](https://tailwindcss.com/) - Styling
-- [NextAuth.js](https://next-auth.js.org/) - Authentication
-- [React Query](https://tanstack.com/query/latest) - Data fetching
-- [date-fns](https://date-fns.org/) - Date manipulation
-- [sonner](https://sonner.emilkowal.ski/) - Toast notifications
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
+
+## Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+- Supabase account
+
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+# Application Configuration
+NODE_ENV=development
+PORT=3000
+FRONTEND_URL=http://localhost:3000
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-nextauth-secret-key
+
+# Supabase Configuration
+SUPABASE_DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres
+SUPABASE_URL=https://[YOUR-PROJECT-REF].supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Other configurations...
+```
 
 ## Getting Started
 
 1. Clone the repository
 2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Create a `.env` file with the following variables:
-
-```env
-DATABASE_URL="postgresql://postgres:2303@db.aapfntknrkwbtddzdgjb.supabase.co:5432/postgres"
-NEXTAUTH_URL=https://ulster-delt.netlify.app
-NEXTAUTH_SECRET="j15s0r596z02bdVVpkrSbHf0hDkbrEL8MzCxtsOMdM8="
-
-4. Set up the database:
-
-```bash
-npx prisma migrate dev
-```
-
+   ```bash
+   npm install
+   ```
+3. Set up your Supabase project and get your credentials
+4. Copy the environment variables from `.env.template` to `.env` and fill in your values
 5. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-```bash
-npm run dev
-```
+## Database Setup
 
-6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Create a new project in Supabase
+2. Get your database connection string and API keys
+3. Update your `.env` file with the Supabase credentials
+4. Run the Prisma migrations:
+   ```bash
+   npx prisma migrate dev
+   ```
+
+## Deployment
+
+The application is configured for deployment on Netlify. Make sure to:
+
+1. Set up your environment variables in Netlify
+2. Ensure your Supabase database is accessible from Netlify
+3. Configure your build settings in `netlify.toml`
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
 
 ## License
 
-MIT
+This project is licensed under the MIT License.
